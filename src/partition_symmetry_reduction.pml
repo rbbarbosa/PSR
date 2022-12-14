@@ -41,6 +41,16 @@ proctype Process(byte input) {
     assert(ghost == decision)
 }
 
+// the initial partition is just [n,0,0,...,0]
+inline init_partition(partition, end, size) {
+    partition[0] = size;
+    end = 1
+}
+
+// evaluates if the current partition is the last possible one
+#define last_partition(partition) (partition[0] == 1)
+
+// computes the following partition in lexicographic order
 inline next_partition(partition, end, tmp) {
     tmp = 1;
     do
@@ -61,14 +71,12 @@ inline next_partition(partition, end, tmp) {
     partition[end-1] = tmp
 }
 
-#define last_partition(partition) (partition[0] == 1)
-
 // process initialization using Partition Symmetry Reduction
 init {
-    byte partition[n];  // holds the current partition
-    partition[0] = n;   // the initial partition is just [n]
-    byte i = 1, v;      // i points to the partition's end
-    byte count;         // counts processes in each group
+    byte partition[n];   // holds the current partition
+    byte i;              // i points to the partition's end
+    init_partition(partition, i, n);
+    byte v, count;
     atomic {
         do
         :: !last_partition(partition) ->
