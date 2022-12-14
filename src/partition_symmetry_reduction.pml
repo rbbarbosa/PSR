@@ -41,64 +41,84 @@ proctype Process(byte input) {
     assert(ghost == decision)
 }
 
+byte partition[n];   // holds the current partition
+byte p_end;          // points to the partition's end
+byte tmp, count;     // temporary variables
+
 // the initial partition is just [n,0,0,...,0]
-inline init_partition(partition, end, size) {
-    partition[0] = size;
-    end = 1
+inline init_partition() {
+    partition[0] = n;   // ToDo: loop initializing all elements to zero
+    p_end = 1
 }
 
 // evaluates if the current partition is the last possible one
-#define last_partition(partition) (partition[0] == 1)
+#define last_partition() (partition[0] == 1)
 
-// computes the following partition in lexicographic order
-inline next_partition(partition, end, tmp) {
+// computes the next partition in lexicographic order
+inline next_partition() {
     tmp = 1;
     do
-    :: partition[end-1] == 1 ->
-       end--;             // index of last element > 1
+    :: partition[p_end-1] == 1 ->
+       p_end--;             // index of last element > 1
        tmp++              // elements to be updated
     :: else -> break
     od;
-    partition[end-1]--;   // update partition elements
+    partition[p_end-1]--;   // update partition elements
     do
-    :: partition[end-1] < tmp ->
-       tmp = tmp - partition[end-1];
-       partition[i] = partition[end-1];
-       end++
+    :: partition[p_end-1] < tmp ->
+       tmp = tmp - partition[p_end-1];
+       partition[p_end] = partition[p_end-1];
+       p_end++
     :: else -> break
     od;
-    end++;
-    partition[end-1] = tmp
+    p_end++;
+    partition[p_end-1] = tmp
+}
+
+inline select_partition(values) {
+    count = 0;
+    tmp = 0;
+    do
+    :: count < partition[p_end-1] ->
+       values[tmp] = p_end;
+       tmp++;
+       count++
+    :: else ->
+       p_end--;   // ToDo: consider using another variable instead
+       count = 0;
+       if
+       :: p_end == 0 -> break
+       :: else -> skip
+       fi
+    od
+}
+
+inline print(array, size) {   // debug
+    for(tmp : 0 .. (size-1)) {
+        printf("[%d]", array[tmp]);
+    }
+    printf("\n");
 }
 
 // process initialization using Partition Symmetry Reduction
 init {
-    byte partition[n];   // holds the current partition
-    byte i;              // i points to the partition's end
-    init_partition(partition, i, n);
-    byte v, count;
+    byte values[n];
+    byte i;
+    init_partition();
     atomic {
         do
-        :: !last_partition(partition) ->
-           next_partition(partition, i, v)
-        :: true ->               // use the current partition
-           v = i;                // begin with highest value
-           count = 0;
-           do
-           :: count < partition[v-1] ->
-              run Process(v);    // start and count processes
-              count++            // in group that has value v
-           :: else ->
-              v--;
-              count = 0;
-              if
-              :: v == 0 -> break // end with lowest value
-              :: else -> skip
-              fi
-           od;
-           assert(_nr_pr == n+1);
+        :: !last_partition() ->
+           print(partition, n);
+           next_partition();
+        :: true ->
+           print(partition, n)
+           select_partition(values);
+           print(values, n)
            break
-        od
+        od;
+        for(i : 1 .. n) {
+            run Process(values[i-1])
+        }
     }
 }
 
