@@ -41,6 +41,28 @@ proctype Process(byte input) {
     assert(ghost == decision)
 }
 
+inline next_partition(partition, end, tmp) {
+    tmp = 1;
+    do
+    :: partition[end-1] == 1 ->
+       end--;             // index of last element > 1
+       tmp++              // elements to be updated
+    :: else -> break
+    od;
+    partition[end-1]--;   // update partition elements
+    do
+    :: partition[end-1] < tmp ->
+       tmp = tmp - partition[end-1];
+       partition[i] = partition[end-1];
+       end++
+    :: else -> break
+    od;
+    end++;
+    partition[end-1] = tmp
+}
+
+#define last_partition(partition) (partition[0] == 1)
+
 // process initialization using Partition Symmetry Reduction
 init {
     byte partition[n];  // holds the current partition
@@ -49,24 +71,8 @@ init {
     partition[0] = n;   // the initial partition is just [n]
     atomic {
         do
-        :: partition[0] != 1 ->  // if more partitions exist
-           v = 1;                // compute the next partition
-           do
-           :: partition[i-1] == 1 ->
-              i--;               // index of last element > 1
-              v++                // elements to be updated
-           :: else -> break
-           od;
-           partition[i-1]--;     // update partition elements
-           do
-           :: partition[i-1] < v ->
-              v = v - partition[i-1];
-              partition[i] = partition[i-1];
-              i++
-           :: else -> break
-           od;
-           i++;
-           partition[i-1] = v
+        :: !last_partition(partition) ->  // if more partitions exist
+           next_partition(partition, i, v)
         :: true ->               // use the current partition
            v = i;                // begin with highest value
            count = 0;
