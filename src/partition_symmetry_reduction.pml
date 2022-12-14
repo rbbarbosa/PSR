@@ -66,12 +66,12 @@ inline next_partition(partition, end, tmp) {
 // process initialization using Partition Symmetry Reduction
 init {
     byte partition[n];  // holds the current partition
-    byte v, i = 1;      // i points to the partition's end
-    byte count;         // counts processes in each group
     partition[0] = n;   // the initial partition is just [n]
+    byte i = 1, v;      // i points to the partition's end
+    byte count;         // counts processes in each group
     atomic {
         do
-        :: !last_partition(partition) ->  // if more partitions exist
+        :: !last_partition(partition) ->
            next_partition(partition, i, v)
         :: true ->               // use the current partition
            v = i;                // begin with highest value
