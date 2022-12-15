@@ -47,7 +47,7 @@ byte tmp, count;     // temporary variables
 
 // the initial partition is just [n,0,0,...,0]
 inline init_partition() {
-    for(tmp in partition) {
+    for(tmp : 1 .. n-1) {
         partition[tmp] = 0
     }
     partition[0] = n;
@@ -80,18 +80,18 @@ inline next_partition() {
 
 // transforms the current partition into an array of usable values
 inline select_partition(values) {
-    count = partition[p_end-1];
+    count = 0;
     tmp = 0;
     do
-    :: count > 0 ->
-       count--;
+    :: count < partition[p_end-1] ->
+       count++;
        values[tmp] = p_end;
        tmp++
     :: else ->
        p_end--;   // ToDo: consider using another variable instead
        if
        :: p_end == 0 -> break
-       :: else -> count = partition[p_end-1]
+       :: else -> count = 0
        fi
     od
 }
@@ -116,7 +116,7 @@ init {
         :: true ->
            print(partition)
            select_partition(values);
-           print(values)
+           print(values);
            break
         od;
         for(i : 1 .. n) {
@@ -124,6 +124,10 @@ init {
         }
     }
 }
+
+// correctness properties:
+// 1. all partitions are unique (order is irrelevant, sort before)
+// 2. the sum of all elements equals n
 
 /*
 // default process initialization, without any reduction
