@@ -47,8 +47,11 @@ byte tmp, count;     // temporary variables
 
 // the initial partition is just [n,0,0,...,0]
 inline init_partition() {
-    partition[0] = n;   // ToDo: loop initializing all elements to zero
-    p_end = 1
+    for(tmp in partition) {
+        partition[tmp] = 0
+    }
+    partition[0] = n;
+    p_end = 1   // the initial partition contains a single element
 }
 
 // evaluates if the current partition is the last possible one
@@ -60,7 +63,7 @@ inline next_partition() {
     do
     :: partition[p_end-1] == 1 ->
        p_end--;             // index of last element > 1
-       tmp++              // elements to be updated
+       tmp++                // elements to be updated
     :: else -> break
     od;
     partition[p_end-1]--;   // update partition elements
@@ -75,26 +78,26 @@ inline next_partition() {
     partition[p_end-1] = tmp
 }
 
+// transforms the current partition into an array of usable values
 inline select_partition(values) {
-    count = 0;
+    count = partition[p_end-1];
     tmp = 0;
     do
-    :: count < partition[p_end-1] ->
+    :: count > 0 ->
+       count--;
        values[tmp] = p_end;
-       tmp++;
-       count++
+       tmp++
     :: else ->
        p_end--;   // ToDo: consider using another variable instead
-       count = 0;
        if
        :: p_end == 0 -> break
-       :: else -> skip
+       :: else -> count = partition[p_end-1]
        fi
     od
 }
 
-inline print(array, size) {   // debug
-    for(tmp : 0 .. (size-1)) {
+inline print(array) {   // debug
+    for(tmp in array) {
         printf("[%d]", array[tmp]);
     }
     printf("\n");
@@ -108,12 +111,12 @@ init {
     atomic {
         do
         :: !last_partition() ->
-           print(partition, n);
+           print(partition);
            next_partition();
         :: true ->
-           print(partition, n)
+           print(partition)
            select_partition(values);
-           print(values, n)
+           print(values)
            break
         od;
         for(i : 1 .. n) {
