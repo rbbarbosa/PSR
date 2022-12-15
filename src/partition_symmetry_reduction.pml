@@ -84,15 +84,19 @@ inline select_partition(values) {
     tmp = 0;
     do
     :: count < partition[p_end-1] ->
-       count++;
-       values[tmp] = p_end;
+       count++;               // count the members of each group
+       values[tmp] = p_end;   // and give them the correct value
        tmp++
     :: else ->
-       p_end--;   // ToDo: consider using another variable instead
+       p_end--;
        if
        :: p_end == 0 -> break
        :: else -> count = 0
        fi
+    od;
+    do // restore the correct value of p_end
+    :: partition[p_end] != 0 && p_end < n-1 -> p_end++
+    :: else -> break
     od
 }
 
@@ -112,9 +116,11 @@ init {
         do
         :: !last_partition() ->
            print(partition);
-           next_partition();
+           select_partition(values);
+           print(values);
+           next_partition()
         :: true ->
-           print(partition)
+           print(partition);
            select_partition(values);
            print(values);
            break
@@ -126,8 +132,12 @@ init {
 }
 
 // correctness properties:
-// 1. all partitions are unique (order is irrelevant, sort before)
-// 2. the sum of all elements equals n
+// 1. all partitions are unique
+//    - order is irrelevant, partitions already sorted so just verify, before, that really are
+//    - nondeterministically select 2 partitions --> they must differ
+//    - make the exact same checks for the resulting values
+// 2. the sum of all elements in every partition equals n
+//    - check before and after every call to next_partition()
 
 /*
 // default process initialization, without any reduction
