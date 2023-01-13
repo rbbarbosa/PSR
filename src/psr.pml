@@ -60,26 +60,10 @@ inline select_partition(values) {
        :: else -> count = 0
        fi
     od;
-    for(tmp in partition) { skip }
-    do // restore the correct value of p_end
-    :: partition[p_end] != 0 && p_end < tmp-1 -> p_end++
-    :: else -> break
-    od
-}
-
-inline print(array) {   // debug
-    for(tmp in array) {
-        printf("[%d]", array[tmp]);
+    for(tmp in partition) {
+        if
+        :: partition[tmp] == 0 -> break
+        :: else -> p_end++
+        fi
     }
-    printf("\n");
 }
-
-// correctness properties:
-// 1. all partitions are unique
-//    - order is irrelevant, partitions already sorted so just verify, before, that really are
-//    - nondeterministically select 2 partitions --> they must differ
-//    - make the exact same checks for the resulting values
-// 2. the sum of all elements of each partition equals n
-//    - check before and after every call to next_partition()
-// 3. the total number of partitions equals the theoretical p(n)
-//    - just declare an inline or a #define
