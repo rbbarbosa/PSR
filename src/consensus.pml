@@ -57,14 +57,10 @@ init {
     atomic {
         do
         :: !last_partition() ->
-           print(partition);
            select_partition(values);
-           print(values);
            next_partition()
         :: true ->
-           print(partition);
            select_partition(values);
-           print(values);
            break
         od;
         for(i : 1 .. n) {
