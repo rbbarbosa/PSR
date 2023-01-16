@@ -8,7 +8,8 @@ algorithms. Software Quality Journal, 29(3), 705-731.
 */
 
 /* declares all necessary variables and resets the partition */
-#define init_partition(n) byte partition[n], p_end, tmp, count, p_curr; reset_partition();
+#define init_partition(n) byte partition[n], p_end, count, \
+                          tmp, p_curr; reset_partition();
 
 // the first partition is just [n,0,0,...,0]
 inline reset_partition() {
@@ -50,8 +51,8 @@ inline select_partition(values) {
     for(tmp in partition) {
         if
         :: count < partition[p_curr] ->
-           count++;                 // count the members of each group
-           values[tmp] = p_curr+1   // and give them the correct value
+           count++;                 // count elements in group
+           values[tmp] = p_curr+1   // assign the correct value
         :: else ->
            p_curr++;
            count = 0;
