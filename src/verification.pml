@@ -1,17 +1,21 @@
 /*
 Correctness properties:
 
-1. all partitions are unique
+1. the total number of partitions equals the theoretical partition function p(n)
+   - generate and cound all partitions and check that total == p(n)
+
+2. the sum of partition elements equals n
+   - along with 1., invert the values back into a partition and...
+   - ...check that the sum of elements equals n
+
+3. all partitions are unique
    - non-deterministically select any two partitions and check that they differ
    - partitions are sorted, so checking for differences is simple
-
-2. the total number of partitions equals the theoretical partition function p(n)
-   - generate and cound all partitions and check that total == p(n)
 */
 
 #include "psr.pml"
 
-#define n 15
+#define n 19
 
 inline check_total(total) {
     if
@@ -39,9 +43,34 @@ inline check_total(total) {
     fi
 }
 
+inline print(array) {
+    for(tmp in array) {
+        printf("[%d]", array[tmp]);
+    }
+    printf("\n");
+}
+
+inline check_sum(values, inversion) {
+   for(i in inversion) {   // invert the values back into a partition
+      c = 0;
+      for(j in values) {
+         if
+         :: values[j] == i+1 -> c++
+         :: else -> skip
+         fi
+      }
+      inversion[i] = c
+   }
+   c = 0;   // compute the sum of elements in the partition
+   for(i in inversion) {
+      c = c + inversion[i];
+   }
+   assert(c == n)   // the sum of partition elements equals n
+}
+
 init {
     byte part1[n], part2[n];
-    byte i;
+    byte i, j, c;
     short sum;
 
     init_partition(n);
@@ -49,10 +78,14 @@ init {
     sum = 1;
     do
     :: !last_partition() ->
+       select_partition(part1);
+       check_sum(part1, part2);   // check that the sum equals n
        next_partition();
        sum++
     :: else -> break
     od;
+    select_partition(part1);
+    check_sum(part1, part2);   // check that the sum equals n
     check_total(sum);   // check that the total == p(n)
 
     // check that all partitions are unique
@@ -86,11 +119,11 @@ init {
 }
 
 /*
-Verification results for n = 15
+Verification results for n = 19
 
 $ spin -a verification.pml
 $ gcc pan.c -O2 -o pan
-$ ./pan -m100000
+$ ./pan -m1000000
 
 (Spin Version 6.5.2 -- 13 October 2022)
 	+ Partial Order Reduction
@@ -101,32 +134,32 @@ Full statespace search for:
 	acceptance   cycles 	- (not selected)
 	invalid end states	+
 
-State-vector 64 byte, depth reached 12146, errors: 0
- 62501171 states, stored
-    60206 states, matched
- 62561377 transitions (= stored+matched)
+State-vector 80 byte, depth reached 629644, errors: 0
+ 45283601 states, stored
+   475314 states, matched
+ 45758915 transitions (= stored+matched)
         0 atomic steps
-hash conflicts:  13782973 (resolved)
+hash conflicts:  11186243 (resolved)
 
 Stats on memory usage (in Megabytes):
- 5483.730	equivalent memory usage for states (stored*(State-vector + overhead))
- 5363.501	actual memory usage for states (compression: 97.81%)
-         	state-vector as stored = 62 byte + 28 byte overhead
+ 4664.067	equivalent memory usage for states (stored*(State-vector + overhead))
+ 4265.160	actual memory usage for states (compression: 91.45%)
+         	state-vector as stored = 71 byte + 28 byte overhead
   512.000	memory used for hash table (-w26)
-    5.341	memory used for DFS stack (-m100000)
-    2.982	memory lost to fragmentation
- 5877.860	total actual memory usage
+   53.406	memory used for DFS stack (-m1000000)
+    2.687	memory lost to fragmentation
+ 4827.879	total actual memory usage
 
 
 unreached in init
-	./psr.pml:56, state 21, "p_curr = (p_curr+1)"
-	./psr.pml:58, state 23, "tmp = (tmp-1)"
-	./psr.pml:31, state 36, "tmp = (tmp+1)"
-	./psr.pml:38, state 45, "partition[p_end] = partition[(p_end-1)]"
-	./psr.pml:39, state 46, "p_end = (p_end+1)"
-	verification.pml:38, state 274, "assert(0)"
-	(6 of 278 states)
+	verification.pml:42, state 196, "assert(0)"
+	verification.pml:57, state 220, "p_curr = (p_curr+1)"
+	verification.pml:59, state 222, "tmp = (tmp-1)"
+	verification.pml:32, state 235, "tmp = (tmp+1)"
+	verification.pml:39, state 244, "partition[p_end] = partition[(p_end-1)]"
+	verification.pml:40, state 245, "p_end = (p_end+1)"
+	(6 of 390 states)
 
-pan: elapsed time 49.1 seconds
-pan: rate   1272418 states/second
+pan: elapsed time 35.8 seconds
+pan: rate 1265258.5 states/second
 */
