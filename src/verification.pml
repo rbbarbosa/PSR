@@ -45,6 +45,18 @@ init {
     short sum;
 
     init_partition(n);
+    // count the total number of partitions
+    sum = 1;
+    do
+    :: !last_partition() ->
+       next_partition();
+       sum++
+    :: else -> break
+    od;
+    check_total(sum);   // check that the total == p(n)
+
+    // check that all partitions are unique
+    reset_partition();
     select_partition(part1);
     next_partition();
     select_partition(part2);
@@ -58,7 +70,6 @@ init {
        select_partition(part2)
     :: true -> break
     od;
-
     // check that both partitions are sorted in descending order
     for(i : 0 .. n-2) {
        assert(part1[i] <= part1[i+1] && part2[i] <= part2[i+1])
@@ -71,18 +82,7 @@ init {
        :: else -> skip
        fi
     };
-    assert(different);   // check that the partitions are different
-    
-    // count the total number of partitions
-    reset_partition();
-    sum = 1;
-    do
-    :: !last_partition() ->
-       next_partition();
-       sum++
-    :: else -> break
-    od;
-    check_total(sum)   // check that the total == p(n)
+    assert(different)   // check that the partitions are different
 }
 
 /*
