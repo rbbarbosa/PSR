@@ -64,22 +64,22 @@ inline check_sum(values, inversion) {
 init {
     byte part1[n], part2[n];
     byte i, j, c;
-    short sum;
+    short total;
 
     init_partition(n);
     // count the total number of partitions
-    sum = 1;
+    total = 1;
     do
     :: !last_partition() ->
        select_partition(part1);
-       check_sum(part1, part2);   // check that the sum equals n
+       check_sum(part1, part2);  // check that the sum equals n
        next_partition();
-       sum++
+       total++
     :: else -> break
     od;
     select_partition(part1);
-    check_sum(part1, part2);   // check that the sum equals n
-    check_total(sum);   // check that the total == p(n)
+    check_sum(part1, part2);     // check that the sum equals n
+    check_total(total);          // check that the total == p(n)
 
     // check that all partitions are unique
     reset_partition();
@@ -96,7 +96,7 @@ init {
        select_partition(part2)
     :: true -> break
     od;
-    // check that both partitions are sorted in descending order
+    // check that both partitions are sorted in ascending order
     for(i : 0 .. n-2) {
        assert(part1[i] <= part1[i+1] && part2[i] <= part2[i+1])
     }
