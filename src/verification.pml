@@ -43,13 +43,6 @@ inline check_total(total) {
     fi
 }
 
-inline print(array) {
-    for(tmp in array) {
-        printf("[%d]", array[tmp]);
-    }
-    printf("\n");
-}
-
 inline check_sum(values, inversion) {
    for(i in inversion) {   // invert the values back into a partition
       c = 0;
