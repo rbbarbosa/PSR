@@ -27,7 +27,6 @@ byte ghost;
 
 proctype Process(byte input) {
     byte previous, first, decision;
-    printf("{%d}\n", input);
     compare_and_swap(r, 0, input, first);
     if
     :: first == 0 -> decision = input
