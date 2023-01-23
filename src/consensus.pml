@@ -27,6 +27,7 @@ byte ghost;
 
 proctype Process(byte input) {
     byte previous, first, decision;
+    printf("{%d}\n", input);
     compare_and_swap(r, 0, input, first);
     if
     :: first == 0 -> decision = input
@@ -39,11 +40,11 @@ proctype Process(byte input) {
 /*
 // default process initialization, without any reduction
 init {
-    byte v, i;
+    byte value, i;
     atomic {
         for(i : 1 .. n) {
-            select(v : 1 .. n);
-            run Process(v)
+            select(value : 1 .. n);
+            run Process(value)
         }
     }
 }
@@ -57,7 +58,6 @@ init {
     atomic {
         do
         :: !last_partition() ->
-           select_partition(values);
            next_partition()
         :: true ->
            select_partition(values);
@@ -75,40 +75,39 @@ Herlihy's wait-free consensus for n processes.
 For 4 processes the verification yields:
 
 $ spin -a partition_symmetry_reduction.pml 
-$ gcc pan.c -o pan
+$ gcc -O2 pan.c -o pan
 $ ./pan
 
-State-vector 56 byte, depth reached 51, errors: 0
-   487445 states, stored
-   343164 states, matched
-   830609 transitions (= stored+matched)
-   265106 atomic steps
-hash conflicts:      2718 (resolved)
+(Spin Version 6.5.2 -- 13 October 2022)
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	- (none specified)
+	assertion violations	+
+	acceptance   cycles 	- (not selected)
+	invalid end states	+
+
+State-vector 64 byte, depth reached 107, errors: 0
+    10980 states, stored
+     7378 states, matched
+    18358 transitions (= stored+matched)
+     5924 atomic steps
+hash conflicts:         1 (resolved)
 
 Stats on memory usage (in Megabytes):
-   39.049	equivalent memory usage for states (stored*(State-vector + overhead))
-   29.589	actual memory usage for states (compression: 75.78%)
+    0.963	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.967	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  129.413	total actual memory usage
 
-Observations:
 
-- The main cause for the complexity of the verification is the select statement in
-the init process.
+unreached in proctype Process
+	(0 of 20 states)
+unreached in init
+	(0 of 71 states)
 
-- If we have 4 processes then we have only a few combinations that may be fully
-enumerated. Otherwise we have 4^4 = 256 initial states.
-
-Using the init with the Partition Symmetry Reduction:
-
-State-vector 64 byte, depth reached 100, errors: 0
-    10882 states, stored
-     7361 states, matched
-    18243 transitions (= stored+matched)
-     5909 atomic steps
-hash conflicts:         8 (resolved)
-
-Stats on memory usage (in Megabytes):
-    0.955	equivalent memory usage for states (stored*(State-vector + overhead))
-    0.870	actual memory usage for states (compression: 91.14%)
+pan: elapsed time 0 seconds
     
 Observations:
 - nearly two orders of magnitude less memory
