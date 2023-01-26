@@ -1,5 +1,5 @@
 /*
-This is a formalization of Partition Symmetry Reduction, in
+This is a re-implementation of Partition Symmetry Reduction, in
 Promela, for the Spin model checker, presented in:
 
 Barbosa, R., Fonseca, A., & Araujo, F. (2021). Reductions and
@@ -7,9 +7,9 @@ abstractions for formal verification of distributed round-based
 algorithms. Software Quality Journal, 29(3), 705-731.
 */
 
-/* declares all necessary variables and resets the partition */
-#define init_partition(n) byte partition[n], p_end, count, \
-                          tmp, p_curr; reset_partition();
+// declares all necessary variables and resets the partition
+#define init_partition(n) byte partition[n], p_end, tmp, \
+                          count, p_curr; reset_partition();
 
 // the first partition is just [n,0,0,...,0]
 inline reset_partition() {

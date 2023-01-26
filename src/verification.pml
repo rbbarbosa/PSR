@@ -13,7 +13,7 @@ Correctness properties:
    - partitions are sorted, so checking for differences is simple
 */
 
-#include "psr.pml"
+#include "psr.pml"   // include the code that we want to formally verify
 
 #define n 19
 
