@@ -1,4 +1,4 @@
-# Sensor voter
+# Spin tutorial: Sensor voter
 
 We consider a set of distributed components communicating via a bus network:
 
