@@ -93,7 +93,7 @@ recv:
     ghost_voter_output = voter_output
 }
 
-init {
+/*init {
     byte value, i;
     atomic {
         for(i : 1 .. n) {
@@ -101,9 +101,9 @@ init {
             run Sensor(value, i-1)
         }
     }
-}
+}*/
 
-/*init {
+init {
     byte values[n];
     byte i;
     init_partition(n);
@@ -116,7 +116,7 @@ init {
            break
         od;
         for(i : 1 .. n) {
-            run Sensor(values[i-1])
+            run Sensor(values[i-1], i-1)
         }
     }
-}*/
+}

@@ -6,7 +6,7 @@ $ gcc pan.c -O2 -o pan
 $ ./pan -a
 */
 
-//#include "psr.pml"
+#include "psr.pml"
 
 #define n 3
 
@@ -109,7 +109,7 @@ init {
            break
         od;
         for(i : 1 .. n) {
-            run Sensor(values[i-1])
+            run Sensor(values[i-1], i-1)
         }
     }
 }*/
