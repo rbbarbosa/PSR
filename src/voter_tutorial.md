@@ -19,11 +19,11 @@ Sensors are fundamentally very simple: Each sensor is a process initialized with
         bool self_check_ok = false;
         if
         :: true ->
-        self_check_ok = true;
-        sensor_value = input
+           self_check_ok = true;
+           sensor_value = input
         :: true ->
-        self_check_ok = false;
-        sensor_value = -1
+           self_check_ok = false;
+           sensor_value = -1
         fi;
         ghost_values[id] = sensor_value;
         ghost_self_checks[id] = self_check_ok;
@@ -47,10 +47,10 @@ The voter will read from bus channel ``q`` the values provided by the sensors. I
         byte count_values = 0;
         do
         :: q ? sensor_msg, sensor_self_check, read[count_values];
-        if
-        :: sensor_self_check -> count_values++
-        :: else -> skip
-        fi
+           if
+           :: sensor_self_check -> count_values++
+           :: else -> skip
+           fi
         :: count_values == n -> break
         od;
         voter_result = read[0];
@@ -69,12 +69,12 @@ The voter will read from bus channel ``q`` the values provided by the sensors. I
         i = 0;
         do
         :: i < count_values ->
-        if
-        :: min < read[i] && read[i] < max ->
-            voter_result = read[i]
-        :: else -> skip
-        fi;
-        i++
+           if
+           :: min < read[i] && read[i] < max ->
+              voter_result = read[i]
+           :: else -> skip
+           fi;
+           i++
         :: else -> break
         od;
         q ! voter_msg, true, voter_result
@@ -134,6 +134,8 @@ To solve the exercises, you may install Spin or use a _[web interface for Spin](
 6. Specify, using LTL, and verify the following property: always when the voter outputs a value different from ``-1`` then necessarily the output value has to be one of the sensor values.
 
 7. Specify and verify an important liveness property: always when at least one sensor is OK eventually the controller will receive a sensor value.
+
+([Solution](voter_sol.pml))
 
 ## Author
 
